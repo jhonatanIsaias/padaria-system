@@ -1,15 +1,67 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model estoque {
+  id             BigInt        @id @default(autoincrement())
+  created_at     DateTime      @default(now()) @db.Timestamptz(6)
+  qnt_item       Int?          @db.SmallInt
+  qnt_min        Int?          @db.SmallInt
+  id_ingrediente BigInt?
+  ingredientes   ingredientes? @relation(fields: [id_ingrediente], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model ingrediente_receita {
+  id             BigInt        @id @default(autoincrement())
+  id_ingrediente BigInt?
+  id_receita     BigInt?
+  medida         Float?        @db.Real
+  uni_medida     String?       @db.VarChar
+  base           Float?        @db.Real
+  created_at     DateTime      @default(now()) @db.Timestamptz(6)
+  ingredientes   ingredientes? @relation(fields: [id_ingrediente], references: [id], onDelete: Cascade)
+  receitas       receitas?     @relation(fields: [id_receita], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model ingredientes {
+  id                  BigInt                @id @default(autoincrement())
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  nome                String?               @unique @db.VarChar
+  uni_medida_compra   String?
+  valor_item          Float?                @db.Real
+  estoque             estoque[]
+  ingrediente_receita ingrediente_receita[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model receitas {
+  id                  BigInt                @id @default(autoincrement())
+  nome                String?               @db.VarChar
+  descricao           String?
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  id_usuario          Int?                  @db.SmallInt
+  ingrediente_receita ingrediente_receita[]
+  usuarios            usuarios?             @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model usuarios {
+  id         Int        @id @default(autoincrement()) @db.SmallInt
+  nome       String?    @db.VarChar
+  permissao  Int        @db.SmallInt
+  login      String?    @unique @db.VarChar
+  email      String?    @unique @db.VarChar
+  senha      String?
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  receitas   receitas[]
 }
