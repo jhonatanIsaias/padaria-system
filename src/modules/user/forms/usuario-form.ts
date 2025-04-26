@@ -1,8 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { usuarios } from 'generated/prisma';
+import { IsEmail, IsNotEmpty, IsString, MinLength,IsNumber,IsOptional } from 'class-validator';
+
 
 export class UsuarioForm {
   
+  @IsNumber()
+  @IsOptional()
+  id:number;
+
   @IsNotEmpty({message:'o campo nome é obrigatorio'})
   @IsString()
   nome: string;
@@ -18,7 +22,7 @@ export class UsuarioForm {
   @IsNotEmpty({message:'o campo login é obrigatorio'})
   login: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({message:"o campo permissão é obrigatorio"})
   permissao: number;
 
 }

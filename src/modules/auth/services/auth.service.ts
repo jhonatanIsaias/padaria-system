@@ -1,31 +1,44 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { AppException } from 'src/common/exceptions/app.exception';
-import { PrismaService } from 'src/database/prisma.service';
+import { UsuarioDto } from 'src/modules/user/dtos/usuario-dto';
 
 import { UsuarioForm } from 'src/modules/user/forms/usuario-form';
-//import { SupabaseService } from 'src/supabase/supabase.service';
+import { UserService } from 'src/modules/user/services/user.service';
+import { SupabaseService } from 'src/supabase/supabase.service';
 
 @Injectable()
 export class AuthService {
   
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly supabase: SupabaseService
+
+  ) {}
       
   
-  async signup(user: UsuarioForm) {
+  async signup(user: UsuarioForm):Promise<UsuarioDto> {
+    
     //procurando se usuario ja existente no banco
-    const userExist = this.prisma.usuarios.findUnique({
-      where:{
-        email:user.email
-      },
-    });
+    const userExist = await this.userService.findUserByEmail(user.email);
     //se existir retorna uma exception
-    if(userExist === null){
+    if(userExist){
      
       AppException.builder()
       .message('usuario ja cadastrado com esse email')
       .status(HttpStatus.CONFLICT)
       .build();
     }
+
+    const newUser = await this.userService.createUser(user);
     
+    //salva usuario no supabase para poder usar a autenticação 
+    await this.supabase.getClient().auth.admin.createUser({
+      email: user.email,
+      password: user.senha,
+      email_confirm: true,
+    });
+   
+    return UsuarioDto.of(newUser);
+
   }
 }
