@@ -48,19 +48,18 @@ model receitas {
   nome                String?               @db.VarChar
   descricao           String?
   created_at          DateTime              @default(now()) @db.Timestamptz(6)
-  id_usuario          Int?                  @db.SmallInt
+  id_usuario          String?                  @db.Uuid
   ingrediente_receita ingrediente_receita[]
   usuarios            usuarios?             @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model usuarios {
-  id         Int        @id @default(autoincrement()) @db.SmallInt
+  id         String     @id @default(uuid()) @db.Uuid
   nome       String?    @db.VarChar
   permissao  Int        @db.SmallInt
   login      String?    @unique @db.VarChar
   email      String?    @unique @db.VarChar
-  senha      String?
   created_at DateTime   @default(now()) @db.Timestamptz(6)
   receitas   receitas[]
 }

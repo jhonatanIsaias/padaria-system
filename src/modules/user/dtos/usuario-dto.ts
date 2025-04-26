@@ -1,7 +1,7 @@
 import { usuarios } from '@prisma/client'; 
 
 export class UsuarioDto {
-  id:number;
+  id:string;
   nome: string;
   permissao: boolean;
   login: string;

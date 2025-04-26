@@ -28,16 +28,17 @@ export class AuthService {
       .status(HttpStatus.CONFLICT)
       .build();
     }
-
-    const newUser = await this.userService.createUser(user);
-    
-    //salva usuario no supabase para poder usar a autenticação 
-    await this.supabase.getClient().auth.admin.createUser({
+    const userAuth = await this.supabase.getClient().auth.admin.createUser({
       email: user.email,
       password: user.senha,
       email_confirm: true,
     });
    
+    const newUser = await this.userService.createUser(userAuth.data.user?.id!,user);
+    
+    
+    //salva usuario no supabase para poder usar a autenticação 
+  
     return UsuarioDto.of(newUser);
 
   }

@@ -16,13 +16,13 @@ export class UserService {
       return user;
    }
 
-   async createUser(user: UsuarioForm){
+   async createUser(id:string , user: UsuarioForm){
     const newUser = await this.prisma.usuarios.create({
         data: {
+          id:id,
           nome: user.nome,
           email: user.email,
           login: user.login,
-          senha: user.senha,
           permissao: user.permissao,
         },
       });
