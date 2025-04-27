@@ -21,9 +21,7 @@ export class UserService {
         data: {
           id:id,
           nome: user.nome,
-          email: user.email,
-          login: user.login,
-          permissao: user.permissao,
+          email: user.email
         },
       });
 

@@ -17,12 +17,5 @@ export class UsuarioForm {
   @IsString()
   @MinLength(6)
   senha: string;
-
-  @IsString()
-  @IsNotEmpty({message:'o campo login é obrigatorio'})
-  login: string;
-
-  @IsNotEmpty({message:"o campo permissão é obrigatorio"})
-  permissao: number;
-
+  
 }
